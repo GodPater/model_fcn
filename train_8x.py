@@ -106,7 +106,7 @@ upsampled_logits = tf.nn.conv2d_transpose(logits, upsample_filter_tensor_x2,
 
 upsampled_logits = upsampled_logits + aux_logits_16s
 
-# ¶Ôpool3Ö®ºóµÄÍøÂçÊ©¼Ó1x1µÄ¾í»ı
+# å¯¹pool3ä¹‹åçš„ç½‘ç»œæ–½åŠ 1x1çš„å·ç§¯
 pool3_feature = end_points['vgg_16/pool3']
 with tf.variable_scope('vgg_16/fc8'):
     aux_logits_8s = slim.conv2d(pool3_feature, number_of_classes, [1, 1],
@@ -114,22 +114,22 @@ with tf.variable_scope('vgg_16/fc8'):
                                  weights_initializer=tf.zeros_initializer,
                                  scope='conv_pool3')
 
-# ¶ÔµÚÒ»2XÉÏ²ÉÑùºóµÄÍøÂç½øĞĞÔÙ´Î2xÉÏ²ÉÑù
-# output_shapeÎªpool3Ö®ºóµÄÍøÂçÊ©¼Ó1x1¾í»ıµÄÊä³öaux_logits_8s
+# å¯¹ç¬¬ä¸€2Xä¸Šé‡‡æ ·åçš„ç½‘ç»œè¿›è¡Œå†æ¬¡2xä¸Šé‡‡æ ·
+# output_shapeä¸ºpool3ä¹‹åçš„ç½‘ç»œæ–½åŠ 1x1å·ç§¯çš„è¾“å‡ºaux_logits_8s
 upsampled_logits = tf.nn.conv2d_transpose(upsampled_logits, upsample_filter_tensor_x2,
                                           output_shape=tf.shape(aux_logits_8s),
                                           strides=[1, 2, 2, 1],
                                           padding='SAME')
 
-# ¾­¹ı2´Î2XÉÏ²ÉÑùµÄÍøÂç + pool3ºóÍøÂçÖ®¾í»ıÍøÂç
+# ç»è¿‡2æ¬¡2Xä¸Šé‡‡æ ·çš„ç½‘ç»œ + pool3åç½‘ç»œä¹‹å·ç§¯ç½‘ç»œ
 upsampled_logits = upsampled_logits + aux_logits_8s
 
-# ¶ÔÉÏÊöÍøÂç½øĞĞÒ»´Î8XµÄÉÏ²ÉÑù
-# upsample_factorÒÑ¾­¸ÄÎª8
+# å¯¹ä¸Šè¿°ç½‘ç»œè¿›è¡Œä¸€æ¬¡8Xçš„ä¸Šé‡‡æ ·
+# upsample_factorå·²ç»æ”¹ä¸º8
 upsample_filter_np_x8= bilinear_upsample_weights(upsample_factor,
                                                    number_of_classes)
 
-# ¸ÄÎª¾­¹ı8xÉÏ²ÉÑùµÄÍøÂç
+# æ”¹ä¸ºç»è¿‡8xä¸Šé‡‡æ ·çš„ç½‘ç»œ
 upsample_filter_tensor_x8 = tf.Variable(upsample_filter_np_x8, name='vgg_16/fc8/t_conv_x8')
 upsampled_logits = tf.nn.conv2d_transpose(upsampled_logits, upsample_filter_tensor_x8,
                                           output_shape=upsampled_logits_shape,
